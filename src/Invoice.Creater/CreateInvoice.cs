@@ -1,9 +1,7 @@
 ﻿using ImageMagick;
 using Net.Codecrete.QrCodeGenerator;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 

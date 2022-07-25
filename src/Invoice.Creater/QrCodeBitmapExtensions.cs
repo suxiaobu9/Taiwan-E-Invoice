@@ -1,6 +1,5 @@
 ﻿using ImageMagick;
 using Net.Codecrete.QrCodeGenerator;
-using SkiaSharp;
 using System;
 using System.IO;
 
