@@ -116,6 +116,15 @@ namespace Invoice.Creater
             drawables.Draw(image);
         }
 
+        /// <summary>
+        /// 增加置左文字
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="pxFontSize"></param>
+        /// <param name="textLeft"></param>
+        /// <param name="textRight"></param>
+        /// <param name="pxMarginX"></param>
+        /// <param name="pxWidth"></param>
         public void AddTextLeftRight(MagickImage image, double pxFontSize, string textLeft, string textRight, double pxMarginX, double pxWidth)
         {
             PxYPointer += pxFontSize;
@@ -154,32 +163,38 @@ namespace Invoice.Creater
                 drawables.Font(fontFamily);
         }
 
-        public void AddQRCode(MagickImage image, string source1, string source2, int scale, int pxPaperWidth, int pxContentShiftX)
+        /// <summary>
+        /// 增加 QRCode
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="source1"></param>
+        /// <param name="source2"></param>
+        /// <param name="scale"></param>
+        /// <param name="pxPaperWidth"></param>
+        public void AddQRCode(MagickImage image, string source1, string source2, int scale, int pxPaperWidth)
         {
-            var qr1 = QrCode.EncodeText(source1, QrCode.Ecc.High);
-            var qr2 = QrCode.EncodeText(source2, QrCode.Ecc.High);
+            var qr1 = QrCode.EncodeText(source1, QrCode.Ecc.Medium);
+            var qr2 = QrCode.EncodeText(source2, QrCode.Ecc.Medium);
 
             var qrCodeImage1 = qr1.ToImage(scale, 0, MagickColors.Black, MagickColors.Transparent, 203);
             var qrCodeImage2 = qr2.ToImage(scale, 0, MagickColors.Black, MagickColors.Transparent, 203);
 
             PxYPointer += doubleExtension.ToPixal(0.2d);
 
-            var qrCodeWidth = (int)Math.Ceiling(doubleExtension.ToPixal(1.5d));
+            var qrCodeWidth = (int)Math.Ceiling(doubleExtension.ToPixal(1.7d));
 
-            var size = new MagickGeometry(qrCodeWidth, qrCodeWidth)
-            {
-            };
+            var size = new MagickGeometry(qrCodeWidth, qrCodeWidth);
 
             qrCodeImage1.Resize(size);
             qrCodeImage2.Resize(size);
 
-            image.Composite(qrCodeImage1, pxPaperWidth / 4 - qrCodeWidth/2, (int)Math.Floor(PxYPointer), CompositeOperator.Over);
-            image.Composite(qrCodeImage2, (pxPaperWidth / 4 * 3) - qrCodeWidth/2, (int)Math.Floor(PxYPointer), CompositeOperator.Over);
-            PxYPointer += qr1.Size > qr2.Size ? qr1.Size : qr2.Size;
+            image.Composite(qrCodeImage1, pxPaperWidth / 4 - qrCodeImage1.Height / 2, (int)Math.Floor(PxYPointer), CompositeOperator.Over);
+            image.Composite(qrCodeImage2, (pxPaperWidth / 4 * 3) - qrCodeImage2.Height / 2, (int)Math.Floor(PxYPointer), CompositeOperator.Over);
+            PxYPointer += qrCodeWidth;
         }
 
         /// <summary>
-        /// 增加 Code 39
+        /// 增加 Code39 條碼
         /// </summary>
         /// <param name="image"></param>
         /// <param name="source"></param>
@@ -209,15 +224,11 @@ namespace Invoice.Creater
 
             strSource = $"*{strSource.ToUpper()}*";
 
-            var code39Ary = strSource.Select(x => code39[x]).ToArray();
-
-            var strEncode = string.Join("0", code39Ary);
-
+            var strEncode = string.Join("0", strSource.Select(x => code39[x]));
 
             int pxPointerX = 0,
                 pxCode39Width = strEncode.Count(x => x == '1') * 3 + strEncode.Count(x => x == '0') * 1;
 
-            //實作圖片
             using (var code39Image = CreateImage(pxCode39Width, (int)pxHeight, MagickColors.Transparent))
             {
                 var drawables = new Drawables();
@@ -230,12 +241,12 @@ namespace Invoice.Creater
                     int intBarWidth = strEncode[i] == '1' ? 3 : 1,
                         pxShiftX = strEncode[i] == '1' ? 1 : 0;
 
-                    drawables.Line(pxPointerX + pxShiftX, 0, pxPointerX + pxShiftX, pxHeight)
-                        .FillColor(lineColor)
+                    drawables.FillColor(lineColor)
                         .StrokeWidth(intBarWidth)
-                        .StrokeColor(lineColor);
+                        .StrokeColor(lineColor)
+                        .Line(pxPointerX + pxShiftX, 0, pxPointerX + pxShiftX, pxHeight);
 
-                    pxPointerX += intBarWidth;
+                    pxPointerX += (intBarWidth);
                 }
 
                 drawables.Draw(code39Image);
