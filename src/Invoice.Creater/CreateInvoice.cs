@@ -126,23 +126,22 @@ namespace Invoice.Creater
         public void AddTextLeftRight(MagickImage image, double pxFontSize, string textLeft, string textRight, double pxMarginX, double pxWidth)
         {
             PxYPointer += pxFontSize;
-            var leftDrawables = new Drawables();
-            leftDrawables.TextEncoding(Encoding.UTF8)
+
+            var drawables = new Drawables();
+
+            AssignFontFamily(drawables, false);
+            
+            // 左邊字
+            drawables.TextEncoding(Encoding.UTF8)
                 .FontPointSize(pxFontSize)
                 .TextAlignment(TextAlignment.Left)
                 .Text(pxMarginX, PxYPointer, textLeft);
-            AssignFontFamily(leftDrawables, false);
 
-            leftDrawables.Draw(image);
-
-            var rightDrawables = new Drawables();
-            rightDrawables.TextEncoding(Encoding.UTF8)
-                .FontPointSize(pxFontSize)
-                .TextAlignment(TextAlignment.Right)
+            //右邊字
+            drawables.TextAlignment(TextAlignment.Right)
                 .Text(pxWidth - pxMarginX, PxYPointer, textRight);
-            AssignFontFamily(rightDrawables, false);
 
-            rightDrawables.Draw(image);
+            drawables.Draw(image);
         }
 
         /// <summary>

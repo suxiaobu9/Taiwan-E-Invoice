@@ -44,6 +44,8 @@ using (var baseImage = imageDrawer.CreateImage((int)Math.Floor(pxPaperWidth), (i
     imageBytes = baseImage.ToByteArray();
 }
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 var print = false;
 //print = true;
 
@@ -69,16 +71,17 @@ if (print)
     }
 }
 
-
-async void PrintPage(object o, PrintPageEventArgs e)
+void PrintPage(object o, PrintPageEventArgs e)
 {
-    using (var stream = new MemoryStream())
-    {
-        stream.Write(imageBytes, 0, imageBytes.Length);
-        var img = Image.FromStream(stream);
-        var loc = new Point(0, 0);
-        e.Graphics.DrawImage(img, loc);
-    }
+    if (e == null || e.Graphics == null)
+        throw new Exception($"{nameof(e)} or {nameof(e.Graphics)} should not be null");
+
+    using var stream = new MemoryStream();
+    stream.Write(imageBytes, 0, imageBytes.Length);
+    var img = Image.FromStream(stream);
+    var loc = new Point(0, 0);
+    e.Graphics.DrawImage(img, loc);
 }
 
+#pragma warning restore CA1416 // Validate platform compatibility
 
