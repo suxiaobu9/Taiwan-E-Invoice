@@ -2,8 +2,8 @@
 using System.Drawing;
 using System.Drawing.Printing;
 
-string logoPath = @"C:\tmp\logo.png",
-    invoicePath = @"C:\tmp\invoice.png",
+string logoPath = @"logo.png",
+    invoicePath = @"invoice.png",
     qr1 = "AB1122334411107259990000000fc000000fc00000000012345678btFhfsJbFqqto1bisUg2A==:**********:7:14:1:餐-雙層牛肉:1:65:零卡可-中:1:38:",
     qr2 = "**配-經典中薯:1:17:餐-大麥克:1:75:零卡可-中:1:38:配-經典中薯:1:17:$2塑膠袋:1:2"; ;
 
@@ -22,6 +22,12 @@ double cmWidth = 5.1d,
     pxLogoSize = doubleExtension.ToPixal(1.3d);
 
 var imageDrawer = new CreateInvoice(dpi);
+
+using (var logoImage = imageDrawer.CreateImage((int)Math.Floor(pxPaperWidth) , (int)Math.Floor(pxLogoSize)))
+{
+    imageDrawer.AddTextToCenter(logoImage, pxTitleFontSize, "電子發票 LOGO", pxPaperWidth);
+    imageDrawer.Write(logoImage, logoPath);
+}
 
 var imageBytes = Array.Empty<byte>();
 
